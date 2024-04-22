@@ -6,19 +6,26 @@ export default function InputControlled({
   max,
   defaultValue,
   dispatch,
+  type,
 }) {
   const handleOnChange = (e) => {
-    if (effectName === "envolve") {
+    if (effectName !== "volumen") {
+      if (effectName === "envolve") {
+        return dispatch({
+          type: `SET_ENVOLVENT_${inputName.toUpperCase()}`,
+          payload: e.target.value,
+        });
+      }
       return dispatch({
-        type: `SET_ENVOLVENT_${inputName.toUpperCase()}`,
+        type: "SET_EFFECTS",
+        name: effectName,
         payload: e.target.value,
+        field: inputName,
       });
     }
     return dispatch({
-      type: "SET_EFFECTS",
-      name: effectName,
+      type: "SET_VOLUME",
       payload: e.target.value,
-      field: inputName,
     });
   };
 
@@ -28,7 +35,7 @@ export default function InputControlled({
         {inputName}
       </label>
       <input
-        type="range"
+        type={type ? type : "range"}
         name={inputName}
         id={id}
         min={0}

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import InputControlled from "./InputControlled";
 
 export default function PianoControllers({ dispatch }) {
@@ -59,11 +60,6 @@ export default function PianoControllers({ dispatch }) {
           dispatch={dispatch}
         />
       </div>
-      <div className="relative reverb-container"></div>
-      <div className="relative convolver-container"></div>
-      <div className="relative tremolo-container"></div>
-      <div className="relative lps-container"></div>
-      <div className="relative hpf-container"></div>
     </>
   );
 }

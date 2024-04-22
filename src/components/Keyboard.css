@@ -12,10 +12,18 @@ section.keyboard{
     color: white
 }
 
+.white-note.pressed{
+    background-color: rgb(211, 211, 211);
+}
+
 .black-note{
     background-color: black;
     position: absolute;
     border-radius: 0 0 .3rem .3rem;
+}
+
+.black-note.pressed{
+    background-color: rgb(44, 44, 44);
 }
 
 #C4-id{

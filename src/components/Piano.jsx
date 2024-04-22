@@ -2,9 +2,7 @@
 import Pizzicato from "pizzicato";
 import { useState, useEffect } from "react";
 import { KEYS_NOTES } from "../global/contants";
-import StateBoard from "./StateBoard";
 import Keyboard from "./Keyboard";
-import { decl } from "postcss";
 
 export default function Piano({ SoundSource, SoundProperties }) {
   const [pressedKeys, setPressedKeys] = useState([]);
@@ -12,16 +10,26 @@ export default function Piano({ SoundSource, SoundProperties }) {
   useEffect(() => {
     const { attack, release } = SoundProperties.envolvent;
 
+    const { oscilator } = SoundProperties;
+
     const soundsGroup = pressedKeys.map((key) => {
+      var lowPassFilter = new Pizzicato.Effects.LowPassFilter({
+        frequency: 135,
+        peak: 1,
+      });
       const sound = new Pizzicato.Sound({
         source: SoundSource ?? "wave",
         options: {
           frequency: key.frequency,
+          type: oscilator.type,
         },
       });
+      let volumeLevel = parseFloat(SoundProperties.volume.level);
+
       sound.attack = attack;
       sound.release = release;
-      sound.effects;
+      sound.volume = volumeLevel;
+      sound.addEffect(lowPassFilter);
       return sound;
     });
 
@@ -33,13 +41,15 @@ export default function Piano({ SoundSource, SoundProperties }) {
 
     const delay = filters[0];
 
-    const DELAY_EFFECT = new Pizzicato.Effects.Delay({
-      feedback: delay.feedback,
-      time: delay.time,
-      mix: delay.mix,
-    });
+    if (Number(delay.feedback) + Number(delay.time) + Number(delay.mix) > 0) {
+      const DELAY_EFFECT = new Pizzicato.Effects.Delay({
+        feedback: delay.feedback,
+        time: delay.time,
+        mix: delay.mix,
+      });
 
-    MUSICAL_GROUP.addEffect(DELAY_EFFECT);
+      MUSICAL_GROUP.addEffect(DELAY_EFFECT);
+    }
 
     //FIN AGREGAR EFECTOS
 
@@ -74,14 +84,35 @@ export default function Piano({ SoundSource, SoundProperties }) {
       document.removeEventListener("keydown", handleEventKeyDown);
       document.removeEventListener("keyup", handleEventKeyUp);
       MUSICAL_GROUP.stop();
-      //MUSICAL_GROUP.removeEffect(DELAY_EFFECT)
     };
   }, [pressedKeys]);
 
+  const handleClickNote = (note) => {
+    const index = KEYS_NOTES.findIndex((k) => k.musicalNote === note);
+
+    if (index > -1 && !pressedKeys.includes(KEYS_NOTES[index])) {
+      const newPressedKeys = [...pressedKeys];
+      newPressedKeys.push(KEYS_NOTES[index]);
+      setPressedKeys(newPressedKeys);
+    }
+  };
+
+  const handleUnclickNote = (note) => {
+    const index = pressedKeys.findIndex((k) => k.musicalNote === note);
+    if (index > -1) {
+      const newPressedKeys = [...pressedKeys];
+      newPressedKeys.splice(index, 1);
+      setPressedKeys(newPressedKeys);
+    }
+  };
+
   return (
     <>
-      <StateBoard keys={pressedKeys} effects={SoundProperties} />
-      <Keyboard keysPressed={pressedKeys} />
+      <Keyboard
+        keysPressed={pressedKeys}
+        handleClickNote={handleClickNote}
+        handleUnclickNote={handleUnclickNote}
+      />
     </>
   );
 }
