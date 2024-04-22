@@ -30,7 +30,7 @@ export const KEYS_NOTES = [
 		frequency: 349,
 	},
 	{
-		keyboardKey: 'a',
+		keyboardKey: 't',
 		musicalNote: 'Gb4',
 		frequency: 370,
 	},
@@ -47,7 +47,7 @@ export const KEYS_NOTES = [
 	{
 		keyboardKey: 'h',
 		musicalNote: 'A4',
-		frequency: 440,
+		frequency: 432,
 	},
 	{
 		keyboardKey: 'u',

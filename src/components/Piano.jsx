@@ -2,22 +2,47 @@
 import Pizzicato from "pizzicato";
 import { useState, useEffect } from "react";
 import { KEYS_NOTES } from "../global/contants";
+import StateBoard from "./StateBoard";
+import Keyboard from "./Keyboard";
+import { decl } from "postcss";
 
-export default function Piano() {
+export default function Piano({ SoundSource, SoundProperties }) {
   const [pressedKeys, setPressedKeys] = useState([]);
 
   useEffect(() => {
+    const { attack, release } = SoundProperties.envolvent;
+
     const soundsGroup = pressedKeys.map((key) => {
       const sound = new Pizzicato.Sound({
-        source: "wave",
+        source: SoundSource ?? "wave",
         options: {
           frequency: key.frequency,
         },
       });
+      sound.attack = attack;
+      sound.release = release;
+      sound.effects;
       return sound;
     });
 
     const MUSICAL_GROUP = new Pizzicato.Group(soundsGroup);
+
+    //AGREGAR EFECTOS
+
+    const { filters } = SoundProperties;
+
+    const delay = filters[0];
+
+    const DELAY_EFFECT = new Pizzicato.Effects.Delay({
+      feedback: delay.feedback,
+      time: delay.time,
+      mix: delay.mix,
+    });
+
+    MUSICAL_GROUP.addEffect(DELAY_EFFECT);
+
+    //FIN AGREGAR EFECTOS
+
     MUSICAL_GROUP.play();
 
     const handleEventKeyDown = (e) => {
@@ -49,8 +74,14 @@ export default function Piano() {
       document.removeEventListener("keydown", handleEventKeyDown);
       document.removeEventListener("keyup", handleEventKeyUp);
       MUSICAL_GROUP.stop();
+      //MUSICAL_GROUP.removeEffect(DELAY_EFFECT)
     };
   }, [pressedKeys]);
 
-  return <div>{JSON.stringify(pressedKeys)}</div>;
+  return (
+    <>
+      <StateBoard keys={pressedKeys} effects={SoundProperties} />
+      <Keyboard keysPressed={pressedKeys} />
+    </>
+  );
 }
